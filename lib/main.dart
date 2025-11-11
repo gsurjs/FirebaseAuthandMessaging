@@ -73,9 +73,9 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SizedBox(height: 20),
-              RegisterEmailSection(auth: _auth), // [cite: 65]
+              RegisterEmailSection(auth: _auth),
               SizedBox(height: 20),
-              EmailPasswordForm(auth: _auth), // [cite: 65]
+              EmailPasswordForm(auth: _auth),
               SizedBox(height: 20),
             ],
           ),
@@ -95,9 +95,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final User? user = FirebaseAuth.instance.currentUser;
   String _message = '';
 
-  // Logout Functionality [cite: 53]
+  // Logout Functionality 
   void _signOut() async {
-    await FirebaseAuth.instance.signOut(); // [cite: 54]
+    await FirebaseAuth.instance.signOut(); 
     // The AuthWrapper will automatically detect the sign-out
     // and navigate back to the AuthenticationScreen.
   }
@@ -187,22 +187,22 @@ class RegisterEmailSection extends StatefulWidget {
   _RegisterEmailSectionState createState() => _RegisterEmailSectionState();
 }
 
-// [cite: 68]
-class _RegisterEmailSectionState extends State<RegisterEmailSection> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // [cite: 68]
-  final TextEditingController _emailController = TextEditingController(); // [cite: 69]
-  final TextEditingController _passwordController = TextEditingController(); // [cite: 69]
-  bool _success = false; // [cite: 69]
-  bool _initialState = true; // [cite: 69]
-  String? _userEmail; // [cite: 69]
 
-  void _register() async { // [cite: 70]
+class _RegisterEmailSectionState extends State<RegisterEmailSection> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); 
+  final TextEditingController _emailController = TextEditingController(); 
+  final TextEditingController _passwordController = TextEditingController(); 
+  bool _success = false; 
+  bool _initialState = true; 
+  String? _userEmail; 
+
+  void _register() async {
     try {
-      await widget.auth.createUserWithEmailAndPassword( // [cite: 70]
+      await widget.auth.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
-      setState(() { // [cite: 71]
+      setState(() {
         _success = true;
         _userEmail = _emailController.text;
         _initialState = false;
@@ -210,7 +210,7 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
       // Login is automatic upon successful registration,
       // so AuthWrapper will navigate to ProfileScreen.
     } catch (e) {
-      setState(() { // [cite: 72]
+      setState(() { 
         _success = false;
         _initialState = false;
       });
@@ -219,56 +219,56 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Form( // [cite: 73]
+    return Form( 
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          TextFormField( // [cite: 73]
+          TextFormField( 
             controller: _emailController,
             decoration: InputDecoration(labelText: 'Email'),
             validator: (value) {
-              if (value?.isEmpty ?? true) { // [cite: 74]
+              if (value?.isEmpty ?? true) { 
                 return 'Please enter some text';
               }
               return null;
             },
           ),
-          TextFormField( // [cite: 74]
+          TextFormField( 
             controller: _passwordController,
             decoration: InputDecoration(labelText: 'Password'),
-            obscureText: true, // Good practice to hide password
+            obscureText: true, // hide password
             validator: (value) {
-              if (value?.isEmpty ?? true) { // [cite: 75]
+              if (value?.isEmpty ?? true) { 
                 return 'Please enter some text';
               }
-              if (value!.length < 6) { // [cite: 40]
+              if (value!.length < 6) { 
                  return 'Password should be 6 characters or more';
               }
               return null;
             },
           ),
-          Container( // [cite: 76]
+          Container( 
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             alignment: Alignment.center,
             child: ElevatedButton(
               onPressed: () {
-                if (_formKey.currentState!.validate()) { // [cite: 77]
+                if (_formKey.currentState!.validate()) { 
                   _register();
                 }
               },
-              child: Text('Submit'), // [cite: 78]
+              child: Text('Submit'), 
             ),
           ),
-          Container( // [cite: 78]
+          Container( 
             alignment: Alignment.center,
-            child: Text( // [cite: 79]
+            child: Text(
               _initialState
                   ? 'Please Register'
                   : _success
                       ? 'Successfully registered $_userEmail'
                       : 'Registration failed',
-              style: TextStyle(color: _success ? Colors.green : Colors.red), // [cite: 79]
+              style: TextStyle(color: _success ? Colors.green : Colors.red), 
             ),
           ),
         ],
@@ -286,20 +286,20 @@ class EmailPasswordForm extends StatefulWidget {
 }
 
 class _EmailPasswordFormState extends State<EmailPasswordForm> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // [cite: 82]
-  final TextEditingController _emailController = TextEditingController(); // [cite: 83]
-  final TextEditingController _passwordController = TextEditingController(); // [cite: 83]
-  bool _success = false; // [cite: 83]
-  bool _initialState = true; // [cite: 83]
-  String _userEmail = ''; // [cite: 84]
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _success = false; 
+  bool _initialState = true; 
+  String _userEmail = '';
 
-  void _signInWithEmailAndPassword() async { // [cite: 84]
+  void _signInWithEmailAndPassword() async {
     try {
-      await widget.auth.signInWithEmailAndPassword( // [cite: 84]
+      await widget.auth.signInWithEmailAndPassword( 
         email: _emailController.text,
         password: _passwordController.text,
       );
-      setState(() { // [cite: 85]
+      setState(() {
         _success = true;
         _userEmail = _emailController.text;
         _initialState = false;
@@ -307,7 +307,7 @@ class _EmailPasswordFormState extends State<EmailPasswordForm> {
       // Successful sign-in will be detected by AuthWrapper,
       // which will navigate to ProfileScreen.
     } catch (e) {
-      setState(() { // [cite: 86]
+      setState(() { 
         _success = false;
         _initialState = false;
       });
@@ -339,7 +339,7 @@ class _EmailPasswordFormState extends State<EmailPasswordForm> {
           TextFormField(
             controller: _passwordController,
             decoration: InputDecoration(labelText: 'Password'),
-            obscureText: true, // Good practice to hide password
+            obscureText: true, //hide password
             validator: (value) { 
               if (value?.isEmpty ?? true) {
                 return 'Please enter some text';
@@ -368,7 +368,7 @@ class _EmailPasswordFormState extends State<EmailPasswordForm> {
                   : _success
                       ? 'Successfully signed in $_userEmail'
                       : 'Sign in failed',
-              style: TextStyle(color: _success ? Colors.green : Colors.red), // [cite: 94]
+              style: TextStyle(color: _success ? Colors.green : Colors.red),
             ),
           ),
         ],
