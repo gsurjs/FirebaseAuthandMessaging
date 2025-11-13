@@ -2,20 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+
+// Background message handler
+Future<void> _messageHandler(RemoteMessage message) async {
+  print('background message ${message.notification!.body}'); 
+}
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp( 
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseMessaging.onBackgroundMessage(_messageHandler);
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Firebase Auth Demo', 
-      // use an AuthWrapper to decide which screen to show.
+debugShowCheckedModeBanner: false,
+      title: 'Firebase Auth & Messaging', // Updated title
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
       home: AuthWrapper(),
     );
   }
@@ -94,9 +106,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Get the current user from FirebaseAuth
   final User? user = FirebaseAuth.instance.currentUser;
   String _message = '';
+// FCM: Add messaging variable
+  late FirebaseMessaging messaging;
 
+  @override
+  void initState() {
+    super.initState();
+    _setupFirebaseMessaging();
+  }
+
+  void _setupFirebaseMessaging() {
+    messaging = FirebaseMessaging.instance; 
+
+  
+    messaging.subscribeToTopic("messaging"); 
+
+    // This handles notifications when the app is IN THE FOREGROUND 
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+      print("message recieved"); 
+      print(event.notification!.body); 
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Notification"), 
+              content: Text(event.notification!.body!), 
+              actions: [
+                TextButton(
+                  child: Text("Ok"), 
+                  onPressed: () {
+                    Navigator.of(context).pop(); 
+                  },
+                )
+              ],
+            );
+          });
+    });
+
+    // This handles when a user CLICKS a notification
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      print('Message clicked!'); 
+    });
+  }
   // Logout Functionality 
   void _signOut() async {
+    await messaging.unsubscribeFromTopic("messaging");
     await FirebaseAuth.instance.signOut(); 
     // The AuthWrapper will automatically detect the sign-out
     // and navigate back to the AuthenticationScreen.
