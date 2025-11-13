@@ -199,7 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
+        title: Text('Profile & Messaging'),
         actions: <Widget>[
           // Logout Button 
           IconButton(
@@ -226,6 +226,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               'Email: ${user?.email ?? 'Email not found'}', 
               style: Theme.of(context).textTheme.titleMedium,
             ),
+            // status section for FCM
+            SizedBox(height: 32),
+            Text(
+              'Cloud Messaging',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            SizedBox(height: 8),
+            Text('You are subscribed to the "messaging" topic.'),
+            Text('You will receive "regular" and "important" quotes.'), 
+
+
             SizedBox(height: 32),
             // Change Password Functionality 
             Text(
