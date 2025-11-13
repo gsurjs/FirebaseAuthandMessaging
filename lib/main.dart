@@ -103,10 +103,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // Get the current user from FirebaseAuth
   final User? user = FirebaseAuth.instance.currentUser;
   String _message = '';
-// FCM: Add messaging variable
   late FirebaseMessaging messaging;
 
   @override
@@ -116,38 +114,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _setupFirebaseMessaging() {
-    messaging = FirebaseMessaging.instance; 
+    messaging = FirebaseMessaging.instance;
+    messaging.subscribeToTopic("messaging");
 
-  
-    messaging.subscribeToTopic("messaging"); 
-
-    // This handles notifications when the app is IN THE FOREGROUND 
+    // This handles notifications when the app is IN THE FOREGROUND
     FirebaseMessaging.onMessage.listen((RemoteMessage event) {
-      print("message recieved"); 
-      print(event.notification!.body); 
-
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Notification"), 
-              content: Text(event.notification!.body!), 
-              actions: [
-                TextButton(
-                  child: Text("Ok"), 
-                  onPressed: () {
-                    Navigator.of(context).pop(); 
-                  },
-                )
-              ],
-            );
-          });
+      print("message recieved");
+      print(event.notification!.body);
+      
+      // CALL NEW CUSTOM FUNCTION
+      _showNotificationDialog(event);
     });
 
     // This handles when a user CLICKS a notification
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      print('Message clicked!'); 
+      print('Message clicked!');
+      // CALL NEW CUSTOM FUNCTION
+      _showNotificationDialog(message);
     });
+  }
+
+  // Custom dialog function to handle different types 
+  void _showNotificationDialog(RemoteMessage message) {
+    // Check the custom data payload for the 'type' 
+    String type = message.data['type'] ?? 'regular'; // Default to 'regular'
+
+    // Customize appearance based on type 
+    Color titleColor = (type == 'important') ? Colors.red : Colors.blue;
+    IconData titleIcon = (type == 'important') ? Icons.warning : Icons.info;
+    String title = (type == 'important') ? "Important Notification" : "New Notification"; 
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(titleIcon, color: titleColor),
+              SizedBox(width: 10),
+              Text(title, style: TextStyle(color: titleColor)),
+            ],
+          ),
+          content: Text(message.notification?.body ?? "No body"),
+          actions: [
+            TextButton(
+              child: Text("Ok"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
+    );
   }
   // Logout Functionality 
   void _signOut() async {
